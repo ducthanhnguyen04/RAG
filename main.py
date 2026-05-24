@@ -136,10 +136,15 @@ async def main():
     logger.info("=" * 70)
     
     # Check if using mock or real API
-    if not TAVILY_API_KEY:
+    if not USE_MOCK_TAVILY and not TAVILY_API_KEY:
         logger.error("❌ TAVILY_API_KEY not found!")
         logger.error("Please set TAVILY_API_KEY environment variable")
         sys.exit(1)
+    elif USE_MOCK_TAVILY:
+        logger.info("✓ Using MOCK Tavily API (Offline/Demo mode)")
+        logger.info("✓ Using MOCK Query Rewriting")
+        logger.info("✓ Using MOCK Filtering & Definition Detection")
+        logger.info("✓ Using MOCK LLM (for local testing)\n")
     else:
         logger.info("✓ Using Real Tavily API")
         logger.info("✓ Using Real Query Rewriting")
@@ -148,14 +153,11 @@ async def main():
     
     try:
         # Initialize Advanced RAG System with optimization features
-        logger.info("Initializing Advanced RAG System with real Tavily...\n")
+        logger.info("Initializing Advanced RAG System...\n")
         
         rag_system = AdvancedRAGSystem(
-            use_mock_search=False,  # Use REAL Tavily API
+            use_mock_search=USE_MOCK_TAVILY,  # Use mock search if configured
             use_mock_llm=True,  # Keep mock LLM for testing
-            enable_caching=True,
-            cache_ttl=3600,
-            cache_strategy="hybrid",
             language=LLM_LANGUAGE
         )
         

@@ -2,12 +2,14 @@
 TAV-RAG Giao diện Web - Ứng dụng Demo Streamlit
 Giao diện tương tác cho Retrieval-Augmented Generation với Tavily Search API
 """
+# pyrefly: ignore [missing-import]
 import streamlit as st
 import asyncio
 import time
 from pathlib import Path
 import sys
 import pandas as pd
+# pyrefly: ignore [missing-import]
 import matplotlib.pyplot as plt
 
 # Thêm project root vào path
@@ -443,8 +445,8 @@ else:
 # Khởi tạo hệ thống RAG
 def initialize_rag():
     """Khởi tạo hệ thống RAG"""
-    # Check for TAVILY_API_KEY
-    if not TAVILY_API_KEY:
+    # Check for TAVILY_API_KEY if not in mock mode
+    if not USE_MOCK_TAVILY and not TAVILY_API_KEY:
         st.error("❌ TAVILY_API_KEY không được thiết lập!")
         st.error("Vui lòng thiết lập TAVILY_API_KEY trong environment var hoặc .env file")
         st.info("Cách thiết lập:")
@@ -453,7 +455,7 @@ def initialize_rag():
     
     try:
         st.session_state.rag_system = AdvancedRAGSystem(
-            use_mock_search=False,  # Use REAL Tavily API
+            use_mock_search=USE_MOCK_TAVILY,  # Use mock search if configured
             use_mock_llm=True,  # Keep mock LLM for testing
             language=LLM_LANGUAGE
         )
@@ -843,6 +845,7 @@ else:
                         
                         try:
                             import pandas as pd
+                            # pyrefly: ignore [missing-import]
                             import matplotlib.pyplot as plt
                             
                             # Prepare data

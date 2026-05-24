@@ -176,7 +176,15 @@ class FileCache:
                 return None
             
             self.logger.debug(f"File cache HIT for: {query[:30]}...")
-            return data.get('result')
+            
+            result_data = data.get('result')
+            result_type = data.get('result_type')
+            
+            if result_type == 'RAGAnswer':
+                from src.advanced_rag import RAGAnswer
+                return RAGAnswer(**result_data)
+                
+            return result_data
             
         except Exception as e:
             self.logger.error(f"File cache read error: {e}")
@@ -193,9 +201,18 @@ class FileCache:
         filepath = self._get_filename(query)
         
         try:
+            import dataclasses
+            result_type = None
+            serializable_result = result
+            
+            if dataclasses.is_dataclass(result):
+                result_type = result.__class__.__name__
+                serializable_result = dataclasses.asdict(result)
+                
             data = {
                 'query': query,
-                'result': result,
+                'result': serializable_result,
+                'result_type': result_type,
                 'timestamp': time.time()
             }
             
